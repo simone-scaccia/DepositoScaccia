@@ -14,6 +14,26 @@ def count_words(lines):
         word_count += len(words)
     return word_count
 
+def five_most_frequent_words(lines):
+    """Find the five most frequent words in the input case-insensitively."""
+    word_freq = {}
+    for line in lines:
+        # Remove punctuation and split into words
+        words = re.findall(r'\b\w+\b', line.lower())
+        for word in words:
+            if word in word_freq:
+                word_freq[word] += 1
+            else:
+                word_freq[word] = 1
+    # Sort words by frequency and return the top 5
+    sorted_words = sorted(word_freq.items(), key=lambda item: item[1], reverse=True)
+    return sorted_words[:5]
+
+def print_most_frequent_words(words):
+    """Print the most frequent words as word: frequency."""
+    for word, freq in words:
+        print(f"{word}: {freq}")
+
 #Check if the file exists
 if not os.path.exists('input.txt'):
     # Print an error message if the file does not exist
@@ -29,3 +49,7 @@ num_words = count_words(lines)
 
 print(f"Number of lines: {num_lines}")
 print(f"Number of words: {num_words}")
+
+most_frequent_words = five_most_frequent_words(lines)
+print("Five most frequent words:")
+print_most_frequent_words(most_frequent_words)
