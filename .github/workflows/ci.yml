@@ -18,7 +18,6 @@ jobs:
     - name: Installazione dipendenze
       run: |
         pip install -r requirements.txt
-        pip install black isort pytest
 
     - name: Verifica formattazione con Black e isort
       run: |
