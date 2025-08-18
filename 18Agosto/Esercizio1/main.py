@@ -29,10 +29,13 @@ def five_most_frequent_words(lines):
     sorted_words = sorted(word_freq.items(), key=lambda item: item[1], reverse=True)
     return sorted_words[:5]
 
-def print_most_frequent_words(words):
+def print_most_frequent_words(words, output_file=None):
     """Print the most frequent words as word: frequency."""
+    output = []
     for word, freq in words:
-        print(f"{word}: {freq}")
+        output_line = f"{word}: {freq}"
+        output.append(output_line)
+    return '\n'.join(output)
 
 #Check if the file exists
 if not os.path.exists('input.txt'):
@@ -52,4 +55,12 @@ print(f"Number of words: {num_words}")
 
 most_frequent_words = five_most_frequent_words(lines)
 print("Five most frequent words:")
-print_most_frequent_words(most_frequent_words)
+print(print_most_frequent_words(most_frequent_words))
+
+# Save the output to output.txt
+with open('output.txt', 'w') as file:
+    file.write(f"Number of lines: {num_lines}\n")
+    file.write(f"Number of words: {num_words}\n")
+    file.write("Five most frequent words:\n")
+    file.write(print_most_frequent_words(most_frequent_words))
+    file.write("\n")
