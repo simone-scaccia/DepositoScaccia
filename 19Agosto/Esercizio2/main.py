@@ -29,6 +29,7 @@ df["PT08.S5(O3)_class"] = (df["PT08.S5(O3)"] > df["PT08.S5(O3)"].median()).astyp
 # Select features and target variable
 X = df[["Time", "Week", "Month", "PT08.S1(CO)"]]
 y = df["PT08.S1(CO)_class"]
+print("Selected features: PT08.S1(CO)")
 
 # Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
@@ -46,10 +47,10 @@ print("Decision Tree:")
 print(classification_report(y_test, y_pred_tree, digits=3))
 
 # Visualizzazione albero decisionale (figura dedicata)
-plt.figure(figsize=(18, 10))
-plot_tree(tree, feature_names=X.columns, class_names=["Buona qualità dell'aria", "Scarsa qualità dell'aria"], filled=True)
-plt.title("Albero Decisionale – Dataset Air Quality")
-plt.show()
+#plt.figure(figsize=(18, 10))
+#plot_tree(tree, feature_names=X.columns, class_names=["Buona qualità dell'aria", "Scarsa qualità dell'aria"], filled=True)
+#plt.title("Albero Decisionale – Dataset Air Quality")
+#plt.show()
 
 # -------------------------
 # Modello 2 – Logistic Regression
