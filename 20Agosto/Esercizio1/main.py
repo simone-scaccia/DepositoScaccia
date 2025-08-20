@@ -1,7 +1,9 @@
+import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 # Read Mall_Customers.csv
 df = pd.read_csv('Mall_Customers.csv')
@@ -25,7 +27,7 @@ plt.close()
 scaler = StandardScaler()
 df[['Annual Income (k$)', 'Spending Score (1-100)']] = scaler.fit_transform(df[['Annual Income (k$)', 'Spending Score (1-100)']])
 
-def compute_and_plot_kmeans_clusters(n_clusters):
+def compute_and_plot_kmeans_clusters(df, n_clusters):
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
     kmeans.fit(X)
@@ -44,8 +46,8 @@ def compute_and_plot_kmeans_clusters(n_clusters):
 
     return kmeans, df
 
-kmeans_5, df_5 = compute_and_plot_kmeans_clusters(5)
-kmeans_7, df_7 = compute_and_plot_kmeans_clusters(7)
+kmeans_5, df_5 = compute_and_plot_kmeans_clusters(df.copy(), 5)
+kmeans_7, df_7 = compute_and_plot_kmeans_clusters(df.copy(), 7)
 
 
 # Compute the average of the distance between points and their cluster centroids
@@ -61,3 +63,35 @@ print("Density for 5 clusters:")
 print(density_5)
 print("Density for 7 clusters:")
 print(density_7)
+
+# Compute the silhouette score
+def compute_and_plot_silhouette(df, labels):
+    # Compute the silhouette score
+    silhouette_avg = silhouette_score(df[['Annual Income (k$)', 'Spending Score (1-100)']], labels)
+    samples_silhouette = silhouette_samples(df[['Annual Income (k$)', 'Spending Score (1-100)']], labels)
+
+    # Sort the silhouette scores for visualization
+    sorted_labels = np.argsort(labels)
+    sorted_scores = samples_silhouette[sorted_labels]
+    sorted_clusters = labels[sorted_labels]
+
+    # The number of clusters are the unique values in labels
+    n_clusters = len(set(labels))
+
+    # Cluster colors
+    cluster_colors = {i: plt.cm.viridis(i / n_clusters) for i in range(n_clusters)} # select n_clusters colors
+    bar_colors = [cluster_colors[c] for c in sorted_clusters]
+
+    # Save silhouette plot
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(sorted_scores)), sorted_scores, color=bar_colors)
+    plt.axhline(y=silhouette_avg, color='red', linestyle='--', label='Average Silhouette Score')
+    plt.title(f'Silhouette Scores for {n_clusters} Clusters')
+    plt.xlabel('Sample Index')
+    plt.ylabel('Silhouette Score')
+    plt.legend()
+    plt.savefig(f'silhouette_plot_{n_clusters}.png')
+    plt.close()
+
+compute_and_plot_silhouette(df_5, kmeans_5.labels_)
+compute_and_plot_silhouette(df_7, kmeans_7.labels_)
