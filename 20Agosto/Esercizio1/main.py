@@ -24,18 +24,24 @@ plt.show()
 scaler = StandardScaler()
 df[['Annual Income (k$)', 'Spending Score (1-100)']] = scaler.fit_transform(df[['Annual Income (k$)', 'Spending Score (1-100)']])
 
-# Compute Kmeans to cluster "Annual Income (k$)" vs "Spending Score (1-100)"
-kmeans = KMeans(n_clusters=5, random_state=42)
-X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
-kmeans.fit(X)
-df['Cluster'] = kmeans.labels_
+def compute_and_plot_kmeans_clusters(n_clusters):
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    X = df[['Annual Income (k$)', 'Spending Score (1-100)']]
+    kmeans.fit(X)
+    df['Cluster'] = kmeans.labels_
 
-# Show the points of "Annual Income (k$)" vs "Spending Score (1-100)" with clusters and centroids
-plt.figure(figsize=(10, 6))
-plt.scatter(df['Annual Income (k$)'], df['Spending Score (1-100)'], c=df['Cluster'], cmap='viridis')
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c='red', marker='X', s=200, label='Centroids')
-plt.title('Annual Income vs Spending Score with Clusters')
-plt.xlabel('Annual Income (k$)')
-plt.ylabel('Spending Score (1-100)')
-plt.colorbar(label='Cluster')
-plt.show()
+    # Show the points of "Annual Income (k$)" vs "Spending Score (1-100)" with clusters and centroids
+    plt.figure(figsize=(10, 6))
+    plt.scatter(df['Annual Income (k$)'], df['Spending Score (1-100)'], c=df['Cluster'], cmap='viridis')
+    plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], c='red', marker='X', s=200, label='Centroids')
+    plt.title(f'Annual Income vs Spending Score with {n_clusters} Clusters')
+    plt.xlabel('Annual Income (k$)')
+    plt.ylabel('Spending Score (1-100)')
+    plt.colorbar(label='Cluster')
+    plt.show()
+
+    return kmeans, df
+
+kmeans_5, df_5 = compute_and_plot_kmeans_clusters(5)
+kmeans_7, df_7 = compute_and_plot_kmeans_clusters(7)
+
