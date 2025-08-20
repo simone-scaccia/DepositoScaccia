@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 # Read Mall_Customers.csv
 df = pd.read_csv('Mall_Customers.csv')
@@ -18,6 +19,10 @@ plt.title('Annual Income vs Spending Score')
 plt.xlabel('Annual Income (k$)')
 plt.ylabel('Spending Score (1-100)')
 plt.show()
+
+# Apply scaling to "Annual Income (k$)" and "Spending Score (1-100)"
+scaler = StandardScaler()
+df[['Annual Income (k$)', 'Spending Score (1-100)']] = scaler.fit_transform(df[['Annual Income (k$)', 'Spending Score (1-100)']])
 
 # Compute Kmeans to cluster "Annual Income (k$)" vs "Spending Score (1-100)"
 kmeans = KMeans(n_clusters=5, random_state=42)
