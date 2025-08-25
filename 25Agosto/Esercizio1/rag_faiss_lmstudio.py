@@ -4,6 +4,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
+from langchain_community.document_loaders import DirectoryLoader
 
 from openai import AzureOpenAI
 
@@ -37,12 +38,12 @@ class Settings:
     persist_dir: str = "faiss_index_example"
     # Text splitting
     chunk_size: int = 700
-    chunk_overlap: int = 100
+    chunk_overlap: int = 300
     # Retriever (MMR)
-    search_type: str = "mmr"        # "mmr" o "similarity"
-    k: int = 4                      # risultati finali
-    fetch_k: int = 20               # candidati iniziali (per MMR)
-    mmr_lambda: float = 0.3         # 0 = diversificazione massima, 1 = pertinenza massima
+    search_type: str = "similarity"        # "mmr" o "similarity"
+    k: int = 1                      # risultati finali
+    fetch_k: int = 1              # candidati iniziali (per MMR)
+    mmr_lambda: float = 1         # 0 = diversificazione massima, 1 = pertinenza massima
     # Embedding
     hf_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     # LM Studio (OpenAI-compatible)
@@ -240,9 +241,10 @@ def build_rag_chain(llm, retriever):
          "Domanda:\n{question}\n\n"
          "Contesto (estratti selezionati):\n{context}\n\n"
          "Istruzioni:\n"
-         "1) Rispondi solo con informazioni contenute nel contesto.\n"
+         "1) Rispondi SOLO con informazioni contenute nel contesto.\n"
          "2) Cita sempre le fonti pertinenti nel formato [source:FILE].\n"
-         "3) Se la risposta non è nel contesto, scrivi: 'Non è presente nel contesto fornito.'")
+         "3) Se la risposta non è nel contesto, scrivi: 'Non è presente nel contesto fornito.'"
+         )
     ])
 
     # LCEL: dict -> prompt -> llm -> parser
@@ -277,7 +279,9 @@ def main():
     llm = get_llm_from_lmstudio(settings)
 
     # 2) Dati simulati e indicizzazione (load or build)
-    docs = simulate_corpus()
+    # docs = simulate_corpus()
+    loader = DirectoryLoader("db", glob="**/*.md")
+    docs = loader.load()
     vector_store = load_or_build_vectorstore(settings, embeddings, docs)
 
     # 3) Retriever ottimizzato
@@ -288,10 +292,9 @@ def main():
 
     # 5) Esempi di domande
     questions = [
-        "Che cos'è una pipeline RAG e quali sono le sue fasi principali?",
-        "A cosa serve FAISS e quali capacità offre?",
-        "Cos'è MMR e perché è utile durante il retrieval?",
-        "Quale dimensione hanno gli embedding prodotti da all-MiniLM-L6-v2?"
+        "Quanto fa 2 + 2?",
+        "Quanti minuti ci sono in un'ora?",
+        "Qual è l’animale più veloce del mondo?",
     ]
 
     for q in questions:
