@@ -15,6 +15,17 @@ class SearchState(BaseModel):
 class RicercaOCalcoloFlow(Flow[SearchState]):
 
     @start()
+    def init_menu(self):
+        self.state.num_task = input("1 - Ricerca web\n2 - Somma\nScegli un'opzione: ")
+        if self.state.num_task == "1":
+            return "search_internet"
+        elif self.state.num_task == "2":
+            return "sum_numbers"
+        else:
+            print("Opzione non valida. Riprova.")
+            self.init_menu()
+
+    @listen("search_internet")
     def collect_search_query(self):
         self.state.search_query = input("Enter your search query: ")
         return self.state.search_query
@@ -28,6 +39,10 @@ class RicercaOCalcoloFlow(Flow[SearchState]):
         print("Search results:")
         # Accessing the crew output
         print(results)
+
+    @listen("sum_numbers")
+    def sum_two_numbers(self):
+        pass
 
 def kickoff():
     poem_flow = RicercaOCalcoloFlow()
