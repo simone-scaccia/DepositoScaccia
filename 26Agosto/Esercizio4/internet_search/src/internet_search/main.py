@@ -22,11 +22,12 @@ class InternetSearchFlow(Flow[SearchState]):
     @listen(collect_search_query)
     def search_internet(self):
         print("Searching the internet with DuckDuckGo")
-        result = DuckduckgoSearchCrew().crew().kickoff({
+        results = DuckduckgoSearchCrew().crew().kickoff(inputs={
             "user_query": self.state.search_query
         })
-        print("Search results:", result)
-
+        print("Search results:")
+        # Accessing the crew output
+        print(results)
 
 def kickoff():
     poem_flow = InternetSearchFlow()
