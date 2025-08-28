@@ -1,0 +1,8 @@
+research_task:
+  description: >
+    Conduct a thorough research about {question}.
+    Make sure you find any interesting and relevant information using the rag tool.
+  expected_output: >
+    A list with 3 bullet points of the most relevant information about {question} in the context you got.
+  agent: researcher
+  tool: rag_tool
