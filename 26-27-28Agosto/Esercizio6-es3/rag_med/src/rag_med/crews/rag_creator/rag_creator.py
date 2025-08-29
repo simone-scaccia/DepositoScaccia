@@ -1,3 +1,9 @@
+"""Crew definition for creating a simple RAG demonstration crew.
+
+This module declares `RagCreatorCrew`, which wires together a researcher agent
+and a single research task. The crew can be instantiated via the `crew()`
+factory and executed with `kickoff()` elsewhere.
+"""
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent

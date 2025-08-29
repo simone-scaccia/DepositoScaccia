@@ -1,3 +1,8 @@
+"""Crew that searches the web and summarizes results for a given topic.
+
+`SearchSummarizeCrew` wires a search agent using Serper and a summarizer agent
+into a sequential crew with two tasks: searching and summarizing.
+"""
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, tool
 from crewai.agents.agent_builder.base_agent import BaseAgent
