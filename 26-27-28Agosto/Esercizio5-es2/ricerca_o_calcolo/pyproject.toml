@@ -1,0 +1,21 @@
+[project]
+name = "ricerca_o_calcolo"
+version = "0.1.0"
+description = "ricerca_o_calcolo using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]>=0.165.1,<1.0.0",
+]
+
+[project.scripts]
+kickoff = "ricerca_o_calcolo.main:kickoff"
+run_crew = "ricerca_o_calcolo.main:kickoff"
+plot = "ricerca_o_calcolo.main:plot"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "flow"

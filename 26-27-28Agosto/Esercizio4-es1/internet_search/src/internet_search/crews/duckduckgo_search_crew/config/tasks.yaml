@@ -1,0 +1,8 @@
+summarize_web_results_task:
+  description: >
+    Search the internet using DuckDuckGo for the query: "{user_query}" and summarize the top three results.
+  expected_output: >
+    A concise summary of the top three DuckDuckGo search results, highlighting the most relevant information.
+  agent: summarize_web_results
+
+

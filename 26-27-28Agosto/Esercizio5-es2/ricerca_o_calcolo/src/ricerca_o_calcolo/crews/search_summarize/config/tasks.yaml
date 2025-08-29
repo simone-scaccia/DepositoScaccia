@@ -1,0 +1,11 @@
+searcher_task:
+  description: Search the internet for the query {topic} and return the most relevant results.
+  expected_output: A list of the top n search results, highlighting the most relevant information for {topic}.
+  agent: searcher
+
+summarizer_task:
+  description: Create a summary from the most relevant results in {topic}.
+  expected_output: A concise and coherent summary synthesizing the key points from the n results. Create a clear, well-structured summary in Markdown (.md)
+  agent: summarizer
+  context:
+    - searcher_task
