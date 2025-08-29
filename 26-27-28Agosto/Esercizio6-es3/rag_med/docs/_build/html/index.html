@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>rag_med documentation &#8212; rag_med  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="rag-med-documentation">
+<h1>rag_med documentation<a class="headerlink" href="#rag-med-documentation" title="Link to this heading">¶</a></h1>
+<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
+documentation for details.</p>
+<div class="toctree-wrapper compound">
+</div>
+<p id="module-rag_med.main">Application entry-point and flow definition for the RagMed demo.</p>
+<p>This module defines the <cite>RagMed</cite> flow which routes a user query to one of two
+crews based on an LLM’s classification: a web search summarizer crew or a RAG
+creator crew. It also exposes convenience functions <cite>kickoff</cite> and <cite>plot</cite> to
+run and visualize the flow.</p>
+<p class="rubric">Examples</p>
+<p>Create the flow and access its state class:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">rag_med.main</span><span class="w"> </span><span class="kn">import</span> <span class="n">RagMed</span><span class="p">,</span> <span class="n">SearchState</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flow</span> <span class="o">=</span> <span class="n">RagMed</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">flow</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">SearchState</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.main.LLMResponseTask">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.main.</span></span><span class="sig-name descname"><span class="pre">LLMResponseTask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.LLMResponseTask" title="Link to this definition">¶</a></dt>
+<dd><p>Structured response from the LLM menu classifier.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.LLMResponseTask.response">
+<span class="sig-name descname"><span class="pre">response</span></span><a class="headerlink" href="#rag_med.main.LLMResponseTask.response" title="Link to this definition">¶</a></dt>
+<dd><p>One word among “Ricerca”, “Rag”, or “Uscita”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">LLMResponseTask</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;Ricerca&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">response</span>
+<span class="go">&#39;Ricerca&#39;</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.LLMResponseTask.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rag_med.main.LLMResponseTask.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">response</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id0" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.main.RagMed">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.main.</span></span><span class="sig-name descname"><span class="pre">RagMed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FlowPersistence</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed" title="Link to this definition">¶</a></dt>
+<dd><p>Interactive flow that routes to search or RAG based on LLM output.</p>
+<p>The flow starts by asking the user a question, then calls an LLM to decide
+whether to invoke internet search, a RAG demo, or exit.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="rag_med.main.RagMed.init_menu">
+<span class="sig-name descname"><span class="pre">init_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed.init_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Start node that asks the user for a topic and classifies intent.</p>
+<p>Prompts for input on the console, calls the configured LLM to classify
+the intent into one of “Ricerca”, “Rag”, or “Uscita”, and stores the
+result in the flow state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the LLM returns an unexpected payload.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rag_med.main.RagMed.rag_crew">
+<span class="sig-name descname"><span class="pre">rag_crew</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed.rag_crew" title="Link to this definition">¶</a></dt>
+<dd><p>Starts the RAG creator crew with the current question.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rag_med.main.RagMed.restart">
+<span class="sig-name descname"><span class="pre">restart</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed.restart" title="Link to this definition">¶</a></dt>
+<dd><p>Router that loops the flow back to the start.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the start node.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rag_med.main.RagMed.route_init_menu">
+<span class="sig-name descname"><span class="pre">route_init_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed.route_init_menu" title="Link to this definition">¶</a></dt>
+<dd><p>Router that decides the next step based on LLM classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the next node: “search_internet”, “search_rag”, or
+“exit”.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rag_med.main.RagMed.search_crew">
+<span class="sig-name descname"><span class="pre">search_crew</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.RagMed.search_crew" title="Link to this definition">¶</a></dt>
+<dd><p>Starts the internet search+summarize crew with the current topic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.main.SearchState">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.main.</span></span><span class="sig-name descname"><span class="pre">SearchState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_query</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.main.LLMResponseTask" title="rag_med.main.LLMResponseTask"><span class="pre">LLMResponseTask</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.SearchState" title="Link to this definition">¶</a></dt>
+<dd><p>State container for the <cite>RagMed</cite> flow.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.SearchState.search_query">
+<span class="sig-name descname"><span class="pre">search_query</span></span><a class="headerlink" href="#rag_med.main.SearchState.search_query" title="Link to this definition">¶</a></dt>
+<dd><p>The current search query typed by the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.SearchState.response">
+<span class="sig-name descname"><span class="pre">response</span></span><a class="headerlink" href="#rag_med.main.SearchState.response" title="Link to this definition">¶</a></dt>
+<dd><p>The last LLM classification result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#rag_med.main.LLMResponseTask" title="rag_med.main.LLMResponseTask">LLMResponseTask</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.SearchState.question">
+<span class="sig-name descname"><span class="pre">question</span></span><a class="headerlink" href="#rag_med.main.SearchState.question" title="Link to this definition">¶</a></dt>
+<dd><p>The original user question or topic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">SearchState</span><span class="p">(</span><span class="n">question</span><span class="o">=</span><span class="s2">&quot;Cos&#39;e&#39; RAG?&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span><span class="o">.</span><span class="n">question</span>
+<span class="go">&quot;Cos&#39;e&#39; RAG?&quot;</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.main.SearchState.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rag_med.main.SearchState.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">question</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id1" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">response</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#rag_med.main.LLMResponseTask" title="rag_med.main.LLMResponseTask"><span class="pre">LLMResponseTask</span></a></em><a class="headerlink" href="#id2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">search_query</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id3" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.main.kickoff">
+<span class="sig-prename descclassname"><span class="pre">rag_med.main.</span></span><span class="sig-name descname"><span class="pre">kickoff</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.kickoff" title="Link to this definition">¶</a></dt>
+<dd><p>Run the <cite>RagMed</cite> flow end-to-end in interactive mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Launch the interactive flow (requires user input)</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kickoff</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.main.plot">
+<span class="sig-prename descclassname"><span class="pre">rag_med.main.</span></span><span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.main.plot" title="Link to this definition">¶</a></dt>
+<dd><p>Render the flow graph using the built-in plotting utility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate a diagram of the flow</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p id="module-rag_med.tools.rag_faiss_lmstudio">Utilities to build a minimal RAG pipeline backed by FAISS and Azure OpenAI.</p>
+<p>This module contains utilities to create embeddings, load/build a FAISS index,
+assemble a retrieval-augmented generation (RAG) chain, and execute queries.
+Where possible, functions include small doctest examples. Environment variables
+are used to configure Azure OpenAI credentials and deployments.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">Settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">persist_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'faiss_index_example'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">700</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunk_overlap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'similarity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fetch_k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mmr_lambda</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_model_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'sentence-transformers/all-MiniLM-L6-v2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmstudio_model_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'LMSTUDIO_MODEL'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="Link to this definition">¶</a></dt>
+<dd><p>Runtime configuration for the RAG components.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.persist_dir">
+<span class="sig-name descname"><span class="pre">persist_dir</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.persist_dir" title="Link to this definition">¶</a></dt>
+<dd><p>Directory where FAISS artifacts are saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.chunk_size">
+<span class="sig-name descname"><span class="pre">chunk_size</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.chunk_size" title="Link to this definition">¶</a></dt>
+<dd><p>Maximum characters per text chunk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.chunk_overlap">
+<span class="sig-name descname"><span class="pre">chunk_overlap</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.chunk_overlap" title="Link to this definition">¶</a></dt>
+<dd><p>Overlap between consecutive chunks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.search_type">
+<span class="sig-name descname"><span class="pre">search_type</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.search_type" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieval mode, “mmr” or “similarity”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.k" title="Link to this definition">¶</a></dt>
+<dd><p>Number of results returned by the retriever.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.fetch_k">
+<span class="sig-name descname"><span class="pre">fetch_k</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.fetch_k" title="Link to this definition">¶</a></dt>
+<dd><p>Candidate pool size for MMR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.mmr_lambda">
+<span class="sig-name descname"><span class="pre">mmr_lambda</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.mmr_lambda" title="Link to this definition">¶</a></dt>
+<dd><p>Trade-off between relevance and diversity in MMR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.hf_model_name">
+<span class="sig-name descname"><span class="pre">hf_model_name</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.hf_model_name" title="Link to this definition">¶</a></dt>
+<dd><p>Default HF embedding model (not used with Azure).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.Settings.lmstudio_model_env">
+<span class="sig-name descname"><span class="pre">lmstudio_model_env</span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.Settings.lmstudio_model_env" title="Link to this definition">¶</a></dt>
+<dd><p>Env var name that holds the chat model deployment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">chunk_overlap</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">300</span></em><a class="headerlink" href="#id4" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id5">
+<span class="sig-name descname"><span class="pre">chunk_size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">700</span></em><a class="headerlink" href="#id5" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">fetch_k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id6" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">hf_model_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sentence-transformers/all-MiniLM-L6-v2'</span></em><a class="headerlink" href="#id7" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id8">
+<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id8" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id9">
+<span class="sig-name descname"><span class="pre">lmstudio_model_env</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LMSTUDIO_MODEL'</span></em><a class="headerlink" href="#id9" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id10">
+<span class="sig-name descname"><span class="pre">mmr_lambda</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#id10" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id11">
+<span class="sig-name descname"><span class="pre">persist_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'faiss_index_example'</span></em><a class="headerlink" href="#id11" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id12">
+<span class="sig-name descname"><span class="pre">search_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'similarity'</span></em><a class="headerlink" href="#id12" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.build_faiss_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">build_faiss_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AzureOpenAI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persist_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">FAISS</span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.build_faiss_vectorstore" title="Link to this definition">¶</a></dt>
+<dd><p>Build a FAISS vector store from chunks and persist it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunks</strong> (<em>List</em><em>[</em><em>Document</em><em>]</em>) – Pre-split documents.</p></li>
+<li><p><strong>embeddings</strong> (<em>AzureOpenAIEmbeddings</em>) – Embedding model.</p></li>
+<li><p><strong>persist_dir</strong> (<em>str</em>) – Directory to store FAISS artifacts.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created vector store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FAISS</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.build_rag_chain">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">build_rag_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.build_rag_chain" title="Link to this definition">¶</a></dt>
+<dd><p>Build the RAG chain: retrieval -&gt; prompt -&gt; LLM -&gt; string output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>llm</strong> – The chat model to generate answers.</p></li>
+<li><p><strong>retriever</strong> – The retriever providing relevant context for the prompt.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A chain that maps a question string to an answer string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Runnable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.build_ragas_dataset">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">build_ragas_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">questions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ground_truth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.build_ragas_dataset" title="Link to this definition">¶</a></dt>
+<dd><p>Run RAG for each question and return a dataset suitable for Ragas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>questions</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Questions to evaluate.</p></li>
+<li><p><strong>retriever</strong> – Retriever used to obtain contexts.</p></li>
+<li><p><strong>chain</strong> – Chain used to produce answers.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of contexts per question.</p></li>
+<li><p><strong>ground_truth</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>] </em><em>| </em><em>None</em>) – Optional references keyed by question.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Each row contains user_input, retrieved_contexts, response, and optional reference.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.format_docs_for_prompt">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">format_docs_for_prompt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.format_docs_for_prompt" title="Link to this definition">¶</a></dt>
+<dd><p>Format retrieved docs into a string with [source:…] citations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>docs</strong> (<em>List</em><em>[</em><em>Document</em><em>]</em>) – Retrieved documents to include in the prompt.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Formatted context string.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.get_contexts_for_question">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">get_contexts_for_question</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retriever</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.get_contexts_for_question" title="Link to this definition">¶</a></dt>
+<dd><p>Return the text of the top-k retrieved chunks used as context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>retriever</strong> – Retriever with an <cite>invoke</cite> method that returns Documents.</p></li>
+<li><p><strong>question</strong> (<em>str</em>) – The user query.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of contexts to return.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The page contents of the top-k retrieved documents.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.get_embeddings">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">get_embeddings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><span class="pre">Settings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">AzureOpenAIEmbeddings</span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.get_embeddings" title="Link to this definition">¶</a></dt>
+<dd><p>Create an Azure OpenAI embeddings client from environment variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> (<a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><em>Settings</em></a>) – Runtime configuration (unused but kept for symmetry).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured embeddings client.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AzureOpenAIEmbeddings</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If required environment variables are missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.get_llm_from_lmstudio">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">get_llm_from_lmstudio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><span class="pre">Settings</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.get_llm_from_lmstudio" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize an Azure OpenAI chat model from environment variables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> (<a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><em>Settings</em></a>) – Runtime configuration.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured chat LLM.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AzureChatOpenAI</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If required environment variables are not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.load_or_build_vectorstore">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">load_or_build_vectorstore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><span class="pre">Settings</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AzureOpenAI</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">FAISS</span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.load_or_build_vectorstore" title="Link to this definition">¶</a></dt>
+<dd><p>Load a persisted FAISS index or build it from documents if missing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>settings</strong> (<a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><em>Settings</em></a>) – Configuration including persistence directory.</p></li>
+<li><p><strong>embeddings</strong> (<em>AzureOpenAIEmbeddings</em>) – Embedding model.</p></li>
+<li><p><strong>docs</strong> (<em>List</em><em>[</em><em>Document</em><em>]</em>) – Source documents.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Loaded or newly built vector store.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>FAISS</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.make_retriever">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">make_retriever</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vector_store</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FAISS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><span class="pre">Settings</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.make_retriever" title="Link to this definition">¶</a></dt>
+<dd><p>Configure a retriever in MMR or pure similarity mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vector_store</strong> (<em>FAISS</em>) – The vector store backing the retriever.</p></li>
+<li><p><strong>settings</strong> (<a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><em>Settings</em></a>) – Retrieval configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A retriever compatible with LangChain invoke interface.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.rag_answer">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">rag_answer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.rag_answer" title="Link to this definition">¶</a></dt>
+<dd><p>Execute the RAG chain for a single question.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<em>str</em>) – Natural language question.</p></li>
+<li><p><strong>chain</strong> – A chain created by <cite>build_rag_chain</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated answer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">_fake_chain</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;echo: </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rag_answer</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">_fake_chain</span><span class="p">)</span>
+<span class="go">&#39;echo: test&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.setup">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.setup" title="Link to this definition">¶</a></dt>
+<dd><p>Create and return a ready-to-use RAG chain using default settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A chain that accepts a question and returns an answer string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">chain</span> <span class="o">=</span> <span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.simulate_corpus">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">simulate_corpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.simulate_corpus" title="Link to this definition">¶</a></dt>
+<dd><p>Create a small English corpus with metadata and <cite>source</cite> for citations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of toy documents used for examples.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Document]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rag_med.tools.rag_faiss_lmstudio.split_documents">
+<span class="sig-prename descclassname"><span class="pre">rag_med.tools.rag_faiss_lmstudio.</span></span><span class="sig-name descname"><span class="pre">split_documents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">docs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><span class="pre">Settings</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Document</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#rag_med.tools.rag_faiss_lmstudio.split_documents" title="Link to this definition">¶</a></dt>
+<dd><p>Split documents into overlapping chunks for better retrieval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>docs</strong> (<em>List</em><em>[</em><em>Document</em><em>]</em>) – The documents to split.</p></li>
+<li><p><strong>settings</strong> (<a class="reference internal" href="#rag_med.tools.rag_faiss_lmstudio.Settings" title="rag_med.tools.rag_faiss_lmstudio.Settings"><em>Settings</em></a>) – Chunking configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The resulting chunks.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Document]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p id="module-rag_med.tools.custom_tool">Custom tool that exposes a simple RAG answer function to agents.</p>
+<p><cite>MyCustomTool</cite> wraps the <cite>rag_answer</cite> function so that agents can retrieve a
+grounded answer from a preconfigured RAG chain.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomTool">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.tools.custom_tool.</span></span><span class="sig-name descname"><span class="pre">MyCustomTool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'RAG'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'RAG</span> <span class="pre">tool</span> <span class="pre">containing</span> <span class="pre">relevant</span> <span class="pre">information</span> <span class="pre">for</span> <span class="pre">retrieval-augmented</span> <span class="pre">generation.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env_vars:</span> <span class="pre">~typing.List[~crewai.tools.base_tool.EnvVar]</span> <span class="pre">=</span> <span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_schema:</span> <span class="pre">~typing.Type[~pydantic.main.BaseModel]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'rag_med.tools.custom_tool.MyCustomToolInput'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_updated:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_function:</span> <span class="pre">~typing.Callable</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">BaseTool.&lt;lambda&gt;&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result_as_answer:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_usage_count:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_usage_count:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomTool" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomTool.args_schema">
+<span class="sig-name descname"><span class="pre">args_schema</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseModel</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomTool.args_schema" title="Link to this definition">¶</a></dt>
+<dd><p>The schema for the arguments that the tool accepts.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomTool.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomTool.description" title="Link to this definition">¶</a></dt>
+<dd><p>Used to tell the model how/when/why to use the tool.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomTool.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True}</span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomTool.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomTool.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomTool.name" title="Link to this definition">¶</a></dt>
+<dd><p>The unique name of the tool that clearly communicates its purpose.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomToolInput">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rag_med.tools.custom_tool.</span></span><span class="sig-name descname"><span class="pre">MyCustomToolInput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomToolInput" title="Link to this definition">¶</a></dt>
+<dd><p>Input schema for MyCustomTool.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomToolInput.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">ConfigDict</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomToolInput.model_config" title="Link to this definition">¶</a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rag_med.tools.custom_tool.MyCustomToolInput.question">
+<span class="sig-name descname"><span class="pre">question</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#rag_med.tools.custom_tool.MyCustomToolInput.question" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<p id="module-rag_med.crews.rag_creator.rag_creator">Crew definition for creating a simple RAG demonstration crew.</p>
+<p>This module declares <cite>RagCreatorCrew</cite>, which wires together a researcher agent
+and a single research task. The crew can be instantiated via the <cite>crew()</cite>
+factory and executed with <cite>kickoff()</cite> elsewhere.</p>
+<p id="module-rag_med.crews.search_summarize.search_summarize">Crew that searches the web and summarizes results for a given topic.</p>
+<p><cite>SearchSummarizeCrew</cite> wires a search agent using Serper and a summarizer agent
+into a sequential crew with two tasks: searching and summarizing.</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">rag_med</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, sim.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

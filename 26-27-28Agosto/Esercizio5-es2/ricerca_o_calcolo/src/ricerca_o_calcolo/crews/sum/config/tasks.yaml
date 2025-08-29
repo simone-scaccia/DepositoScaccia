@@ -1,0 +1,15 @@
+sum_task:
+  description: >
+    Perform the summation of two numbers {arg1} and {arg2} provided by the user using the custom sum tool.
+  expected_output: >
+    The sum of the two numbers, calculated accurately.
+  agent: sum_agent
+
+check_sum_task:
+  description: >
+    Verify the accuracy of the summation, between {arg1} and {arg2}, results produced by the sum agent.
+  expected_output: >
+    A confirmation of whether the summation result is correct or not.
+  agent: check_sum_agent
+  context:
+    - sum_task
